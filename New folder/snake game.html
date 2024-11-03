@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge Yourself to Level Up</title>
+    <style>
+        /* Basic reset and styling */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #1d1f21;
+            font-family: Arial, sans-serif;
+            color: #f7f7f7;
+        }
+        
+        canvas {
+            border: 2px solid #333;
+            background-color: #2b2b2b;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+        }
+        #score {
+            font-size: 24px;
+            margin: 15px;
+            color: #f7f7f7;
+        }
+        #message {
+            display: none;
+            font-size: 22px;
+            color: #ff3333;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        button:hover { background-color: #45a049; }
+        button:disabled { background-color: #888; cursor: not-allowed; }
+
+        /* Styling for the answer input container */
+        #input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        #answer-input {
+            padding: 8px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        #submit-button {
+            display: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #submit-button:hover { background-color: #219150; }
+    </style>
+    
+</head>
+<body>
+    <canvas id="gameCanvas" width="500" height="350"></canvas>
+    <div id="score">Score: 0</div>
+    <div id="message"></div>
+    <button id="startButton">Start Game</button>
+    <button id="restartButton" style="display: none;" disabled>Restart Game</button>
+
+    <div id="input-container">
+        <label for="answer-input">Type the secret answer:</label>
+        <input type="text" id="answer-input" placeholder="Enter your answer here">
+        <button id="submit-button" onclick="handleSubmit()">Submit Answer</button>
+    </div>
+    
+    
+    <script>
+        const correctAnswer = "42";
+        const answerInput = document.getElementById('answer-input');
+        const submitButton = document.getElementById('submit-button');
+
+        answerInput.addEventListener('input', () => {
+            submitButton.style.display = answerInput.value.trim() === correctAnswer ? 'block' : 'none';
+        });
+
+        function handleSubmit() {
+            alert("Correct answer! Button clicked.");
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const box = 15;
+        let snake, food, obstacles, direction, score, gameInterval;
+        let speed = 100;
+
+        document.getElementById('startButton').addEventListener('click', startGame);
+        document.getElementById('restartButton').addEventListener('click', restartGame);
+
+        function startGame() {
+            snake = [{ x: box * 5, y: box * 5 }];
+            food = spawnFood();
+            obstacles = spawnObstacles(5);
+            direction = 'RIGHT';
+            score = 0;
+            document.getElementById('score').innerText = `Score: ${score}`;
+            document.getElementById('message').style.display = 'none';
+            document.getElementById('restartButton').style.display = 'block';
+            document.getElementById('restartButton').disabled = false;
+            gameInterval = setInterval(draw, speed);
+        }
+
+        function restartGame() {
+            clearInterval(gameInterval);
+            startGame();
+        }
+
+        function spawnFood() {
+            return {
+                x: Math.floor(Math.random() * (canvas.width / box)) * box,
+                y: Math.floor(Math.random() * (canvas.height / box)) * box
+            };
+        }
+
+        function spawnObstacles(count) {
+            const obstacles = [];
+            for (let i = 0; i < count; i++) {
+                obstacles.push({
+                    x: Math.floor(Math.random() * (canvas.width / box)) * box,
+                    y: Math.floor(Math.random() * (canvas.height / box)) * box
+                });
+            }
+            return obstacles;
+        }
+
+        function changeDirection(event) {
+            const key = event.key;
+            if (key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
+            if (key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
+            if (key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+            if (key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+        }
+
+        document.addEventListener('keydown', changeDirection);
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw food
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food.x, food.y, box, box);
+
+            // Draw obstacles
+            ctx.fillStyle = 'gray';
+            obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, obstacle.y, box, box);
+            });
+
+            // Draw snake
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = (i === 0) ? 'darkgreen' : 'green';
+                ctx.fillRect(snake[i].x, snake[i].y, box, box);
+                ctx.strokeStyle = 'darkgreen';
+                ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+            }
+
+            // Move snake
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+
+            if (direction === 'LEFT') snakeX -= box;
+            if (direction === 'UP') snakeY -= box;
+            if (direction === 'RIGHT') snakeX += box;
+            if (direction === 'DOWN') snakeY += box;
+
+            // Check for food collision
+            if (snakeX === food.x && snakeY === food.y) {
+                score++;
+                document.getElementById('score').innerText = `Score: ${score}`;
+                food = spawnFood();
+                if (score === 10) {
+                    clearInterval(gameInterval);
+                    speed = 90;
+                    gameInterval = setInterval(draw, speed);
+                }
+                if (score >= 20) {
+                    clearInterval(gameInterval);
+                    document.getElementById('message').innerHTML = `<button onclick="window.location.href='2.html'">Next Level</button>`;
+                    document.getElementById('message').style.display = 'block';
+                    document.getElementById('restartButton').disabled = true;
+                    return;
+                }
+            } else {
+                snake.pop();
+            }
+
+            // Check for wall, self, or obstacle collision
+            if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(snakeX, snakeY, snake) || collision(snakeX, snakeY, obstacles)) {
+                clearInterval(gameInterval);
+                document.getElementById('message').innerText = 'Game Over';
+                document.getElementById('message').style.display = 'block';
+                document.getElementById('restartButton').disabled = false;
+                return;
+            }
+
+            snake.unshift({ x: snakeX, y: snakeY });
+        }
+
+        function collision(x, y, array) {
+            return array.some(item => item.x === x && item.y === y);
+        }
+        function handleSubmit() {
+    const userAnswer = answerInput.value.trim();
+    if (userAnswer === correctAnswer) {
+        // نقل المستخدم إلى الصفحة التالية إذا كانت الإجابة صحيحة
+        window.location.href = '2.html';
+    } else {
+        alert("الإجابة غير صحيحة. حاول مرة أخرى.");
+    }
+}
+
+    </script>
+</body>
+</html>

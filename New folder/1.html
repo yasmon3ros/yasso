@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Button - Dark Mode</title>
+    <style>
+        /* CSS الأساسي */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121212; /* لون الخلفية الداكن */
+            color: #e0e0e0; /* لون النص الفاتح */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            transition: opacity 0.5s ease; /* انتقال التلاشي */
+        }
+
+        .fade-out {
+            opacity: 0; /* تأثير التلاشي */
+        }
+
+        #main-button {
+            padding: 20px 40px;
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            background-color: #1e88e5; /* لون أزرق */
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #main-button:hover {
+            background-color: #1565c0; /* أزرق أغمق عند التحويم */
+            transform: scale(1.05); /* تكبير بسيط عند التحويم */
+        }
+
+        #message {
+            display: none; /* إخفاء الرسالة بشكل افتراضي */
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        #checkboxes {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #e0e0e0; /* لون النص */
+        }
+
+        #submit-button {
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            background-color: #4caf50; /* لون أخضر */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: none; /* إخفاء زر الإرسال بشكل افتراضي */
+            transition: background-color 0.3s;
+        }
+
+        #submit-button:hover {
+            background-color: #388e3c; /* أخضر أغمق عند التحويم */
+        }
+
+        #error-message {
+            color: #ff5252; /* لون أحمر لرسالة الخطأ */
+            margin-top: 10px;
+            display: none; /* إخفاء رسالة الخطأ بشكل افتراضي */
+        }
+    </style>
+</head>
+<body>
+
+    <a href="login.html"><button id="main-button">Click here ya Yasmin</button></a>
+    <div id="message">
+        <p>If you want to know who I am, you must agree to the conditions:</p>
+        <div id="checkboxes">
+            <label>
+                <input type="checkbox" id="checkbox1"> Without insulting
+            </label>
+            <br>
+            <label>
+                <input type="checkbox" id="checkbox2"> Calm down, okay?
+            </label>
+        </div>
+        <button id="submit-button">Submit</button>
+        <div id="error-message">Please agree to both conditions.</div>
+    </div>
+
+    <script>
+        const mainButton = document.getElementById('main-button');
+        const message = document.getElementById('message');
+        const submitButton = document.getElementById('submit-button');
+        const checkbox1 = document.getElementById('checkbox1');
+        const checkbox2 = document.getElementById('checkbox2');
+        const errorMessage = document.getElementById('error-message');
+
+        // إظهار الرسالة وزر الموافقة عند النقر على الزر الرئيسي
+        mainButton.addEventListener('click', (e) => {
+            e.preventDefault(); // منع إعادة التوجيه الفوري
+            message.style.display = 'block'; // إظهار الرسالة
+            submitButton.style.display = 'block'; // إظهار زر الإرسال
+            errorMessage.style.display = 'none'; // إخفاء رسالة الخطأ
+        });
+
+        // التحقق من الشروط وتطبيق التأثير
+        submitButton.addEventListener('click', () => {
+            if (checkbox1.checked && checkbox2.checked) {
+                document.body.classList.add('fade-out'); // إضافة كلاس "التلاشي"
+                
+                setTimeout(() => {
+                    window.location.href = 'login.html'; // إعادة التوجيه بعد التأثير
+                }, 500); // تأخير 500 مللي ثانية لإتاحة الوقت للتأثير
+            } else {
+                errorMessage.style.display = 'block'; // إظهار رسالة الخطأ
+            }
+        });
+    </script>
+
+</body>
+</html>

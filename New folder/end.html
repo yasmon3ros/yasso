@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000; /* Black background as fallback */
+            color: #fff; /* White text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            position: relative; /* For absolute positioning of elements */
+            background-image: url('your-background-image.jpg'); /* Replace with your image */
+            background-size: cover; /* Cover entire background */
+            background-position: center; /* Center the image */
+            transition: background-image 1s ease-in-out; /* Smooth transition for background change */
+        }
+
+        #countdown {
+            font-size: 120px;
+            font-weight: bold;
+            transition: transform 0.3s ease; /* Puff effect */
+            position: absolute;
+            top: 20%; /* Position countdown at the top */
+        }
+
+        .hello-letter {
+            font-size: 100px;
+            display: inline-block;
+            position: absolute;
+            top: 50%; /* Center vertically */
+            opacity: 0; /* Start invisible */
+            color: rgb(163, 51, 228); /* Purple color */
+            animation: fall 1s forwards, scale 0.5s forwards; /* Falling and scaling animation */
+        }
+
+        @keyframes fall {
+            0% { top: -100px; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 50%; transform: translateY(-50%); } /* Center vertically */
+        }
+
+        @keyframes scale {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        audio {
+            display: none; /* Hide audio element */
+        }
+
+        #playAudio {
+            width: 150px;
+            height: 150px;
+            border-radius: 75px; /* Make it circular */
+            background-color: red; /* Red background */
+            color: white; /* White text */
+            border: none; /* No border */
+            font-size: 20px; /* Font size */
+            cursor: pointer; /* Pointer cursor on hover */
+            position: absolute;
+            bottom: 20%; /* Position button at the bottom */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%); /* Adjust for centering */
+            transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+        }
+
+        #playAudio:hover {
+            background-color: darkred; /* Darker red on hover */
+        }
+
+        #playAudio:active {
+            transform: scale(0.95); /* Slightly shrink button on click */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="countdown">10</div>
+    <div id="hello"></div> <!-- Container for falling letters -->
+    <button id="playAudio">Click Here</button> <!-- Circular red button -->
+    <audio id="audio" loop>
+        <source src="Azide - Switch It Up(slowed bassboosted by Daniil Lem)(MP3_320K).mp3" type="audio/mpeg"> <!-- Replace with your audio file -->
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        let countdownElement = document.getElementById('countdown');
+        let helloElement = document.getElementById('hello');
+        let audioElement = document.getElementById('audio');
+        let countdown = 10;
+        let interval;
+
+        // Play audio on button click and change background
+        document.getElementById('playAudio').addEventListener('click', () => {
+            audioElement.play();
+            document.body.style.backgroundImage = "url('18.jpg')"; // Change to your image
+            fadeOutButton(); // Call fade out effect
+        });
+
+        function fadeOutButton() {
+            const button = document.getElementById('playAudio');
+            button.style.opacity = '0'; // Fade out button
+            setTimeout(() => {
+                button.style.display = 'none'; // Hide button after fading out
+            }, 500); // Time until hidden
+        }
+
+        function startCountdown() {
+            interval = setInterval(() => {
+                countdownElement.innerText = countdown;
+
+                // Puff effect for the countdown number
+                countdownElement.style.transform = 'scale(1.5)';
+                setTimeout(() => {
+                    countdownElement.style.transform = 'scale(1)';
+                }, 300); // Reset scale after 300ms
+
+                if (countdown === 1) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        countdownElement.style.opacity = '0'; // Fade out countdown
+                        setTimeout(() => {
+                            countdownElement.style.display = 'none'; // Hide countdown
+                            showHello();
+                        }, 1000); // Wait for fade out to finish
+                    }, 8000); // Wait for 8 seconds at 1
+                }
+
+                countdown -= 1;
+
+                if (countdown < 0) {
+                    clearInterval(interval);
+                }
+            }, 1000); // Normal interval
+        }
+
+        function showHello() {
+            const message = "HELLO CHEKS";
+            helloElement.innerHTML = ""; // Clear previous letters
+
+            // Create a span for each letter
+            for (let i = 0; i < message.length; i++) {
+                const letter = document.createElement('span');
+                letter.className = 'hello-letter';
+                letter.innerText = message[i];
+                letter.style.left = `${50 + i * 90}px`; // Position letters horizontally with more space
+                letter.style.animationDelay = `${i * 0.1}s`; // Stagger the animation
+                helloElement.appendChild(letter);
+            }
+
+            // Center the letters vertically
+            const helloLetters = document.querySelectorAll('.hello-letter');
+            helloLetters.forEach(letter => {
+                letter.style.top = '50%'; // Center vertically
+                letter.style.transform = 'translateY(-50%)'; // Adjust for centering
+                letter.style.opacity = '1'; // Make letters visible
+                letter.style.transition = 'opacity 0.5s ease-in'; // Smooth fade-in effect
+            });
+        }
+
+        startCountdown();
+    </script>
+
+</body>
+</html>
